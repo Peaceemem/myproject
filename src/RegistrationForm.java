@@ -32,11 +32,14 @@ public class RegistrationForm extends JDialog{
     private JPanel signuppanel;
     private JComboBox cbBlood;
 
+    private boolean formValid = true;
+
     public RegistrationForm(JFrame parent){
         super(parent);
         setTitle("Create a new account");
         setContentPane(signuppanel);
-        setMinimumSize(new Dimension(1200,800));
+        setMinimumSize(new Dimension(1000,900));
+       // setLayout(new GridLayout(0,20));
         setModal(true);
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -52,10 +55,10 @@ public class RegistrationForm extends JDialog{
         btnsignin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Login loginFrame = new Login(null);
-                loginFrame.setVisible(true);
-                loginFrame.pack();
-                loginFrame.setLocationRelativeTo(null);
+//                Login loginFrame = new Login(null);
+//                loginFrame.setVisible(true);
+//                loginFrame.pack();
+//                loginFrame.setLocationRelativeTo(null);
                 dispose();
             }
         });
@@ -79,20 +82,16 @@ public class RegistrationForm extends JDialog{
    String firstname = tfFName.getText();
    String lastname = tfLName.getText();
    String email = tfEmail.getText();
-        if (isValidEmail(email)) {
-            // Email is valid, proceed with registration
-            // Your registration logic here
-
-        } else {            // Invalid email format
-            JOptionPane.showMessageDialog(this, "Invalid email format.", "Error", JOptionPane.ERROR_MESSAGE);        }
+        if (!isValidEmail(email)) {
+            // print error and abort
+            JOptionPane.showMessageDialog(this, "Invalid email address.", "Error", JOptionPane.ERROR_MESSAGE);
+            formValid = false;
+        }
 
         String phone = tfPhone.getText();
-        if (isValidPhoneNumber(phone)) {
-            // Phone number is valid, proceed with registration
-            // Your registration logic here
-        } else {
-            // Invalid phone number format
+        if (!isValidPhoneNumber(phone)) {
             JOptionPane.showMessageDialog(this, "Invalid phone number format.", "Error", JOptionPane.ERROR_MESSAGE);
+            formValid = false;
         }
 
    String homeAddress = tfAddress.getText();
@@ -105,9 +104,6 @@ public class RegistrationForm extends JDialog{
             // For example, check if it contains only letters and digits
             if (!medical.matches("[a-zA-Z0-9\\s]+")) {
                 JOptionPane.showMessageDialog(null, "Medical field can only contain letters, digits, and spaces.", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                // Medical field is valid
-                // You can proceed with using the medical string
             }
         }
    String issuingAuthority = tfIssuingAuthority.getText().trim();
@@ -119,29 +115,22 @@ public class RegistrationForm extends JDialog{
             // For example, check if it contains only letters and spaces
             if (!issuingAuthority.matches("[a-zA-Z\\s]+")) {
                 JOptionPane.showMessageDialog(null, "Issuing authority can only contain letters and spaces.", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                // Issuing authority is valid
-                // You can proceed with using the issuingAuthority string
             }
         }
         String certificate = tfCertificate.getText();
         String gender = (String) cbGender.getSelectedItem();
-        //JOptionPane.showMessageDialog(RegistrationForm.this, "Selected Gender:" + gender);
         String blood = (String) cbBlood.getSelectedItem();
-        //JOptionPane.showMessageDialog(RegistrationForm.this, "Selected Gender:" + BloodGroup);
-
         String name1 = tf1Name.getText();
-   String name2 = tf2Name.getText();
-   String name3 = tf3Name.getText();
-   String affiliation1 = tf1Affiliation.getText();
-   String affiliation2 = tf2Affiliation.getText();
-   String affiliation3 = tf3Affiliation.getText();
-   String password = String.valueOf(pfPassword.getPassword());
-   if (isValidPassword(password.toCharArray())){
-
-   }else {
+        String name2 = tf2Name.getText();
+        String name3 = tf3Name.getText();
+        String affiliation1 = tf1Affiliation.getText();
+        String affiliation2 = tf2Affiliation.getText();
+        String affiliation3 = tf3Affiliation.getText();
+        String password = String.valueOf(pfPassword.getPassword());
+   if (!isValidPassword(password.toCharArray())){
        JOptionPane.showMessageDialog(RegistrationForm.this, "Password is not strong enough, Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
-
+                dispose();
+               // return;
    }
    String confirmPassword = String.valueOf(pfConfirmPassword.getPassword());
         if (firstname.isEmpty() || lastname.isEmpty() || email.isEmpty()
@@ -164,10 +153,11 @@ public class RegistrationForm extends JDialog{
         }
         int option = JOptionPane.showConfirmDialog(this, "Are you sure you want to register with the following details?\nName: " + firstname + "\nEmail: " + email, "Confirm Details", JOptionPane.YES_NO_OPTION);
         if (option == JOptionPane.YES_OPTION) {
-            // Proceed with registration
-            // Your registration logic here
             dispose(); // Close the dialog after registration
         }
+
+        if (!formValid) return;
+
         user = addUserToDatabase(firstname, lastname, email,  homeAddress, password, phone, medical, issuingAuthority, certificate, gender, blood, name1
         , name2, name3, affiliation1, affiliation2,affiliation3);
         if (user != null){
@@ -199,6 +189,8 @@ public class RegistrationForm extends JDialog{
     }
 
     public User user;
+
+
     private User addUserToDatabase(String firstname,String lastname,String email, String homeAddress, String password, String phone, String medical,
                                    String issuingAuthority, String certificate, String gender, String blood, String name1
             , String name2,String name3,String affiliation1,String affiliation2, String affiliation3) {
@@ -206,14 +198,14 @@ public class RegistrationForm extends JDialog{
         // let's define some variables that allows us to connect to a database
         final String OB_URL = "jdbc:mysql://localhost/project?serverTimeZone=UTC";
         final String USERNAME = "root";
-        final String PASSWORD = "";
+        final String PASSWORD = "peace@966721";
         try{
             Connection conn = DriverManager.getConnection(OB_URL,USERNAME,PASSWORD);
             // connected to database successful......
 
             //we need to create a sql statement that allows us to add new user
             Statement stat = conn.createStatement();
-            String sql = "INSERT INTO users (firstname, lastname, email, homeAddress,  password, phone, medical, issuingAuthority, certificate, gender, blood, name1, name2, name3, affiliation1, affiliation2, affiliation3 ) " +
+            String sql = "INSERT INTO user (firstname, lastname, email, homeAddress,  password, phone, medical, issuingAuthority, certificate, gender, blood, name1, name2, name3, affiliation1, affiliation2, affiliation3 ) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement prepareStatement = conn.prepareStatement(sql);
             prepareStatement.setString(1, firstname);
@@ -263,12 +255,12 @@ public class RegistrationForm extends JDialog{
         }
         return user;
     }
-
+    public boolean isFormValid() {
+        return false;
+    }
 
         public static void main (String[]args){
             RegistrationForm myForm = new RegistrationForm(null);
-
-            //RegistrationForm myForm = new RegistrationForm(null);
             User user = myForm.user;
             if(user!= null){
                 System.out.println("Successful registration of: " + user.firstname + " " + user.lastname);
@@ -276,4 +268,6 @@ public class RegistrationForm extends JDialog{
                 System.out.println("Registration canceled");
             }
         }
-    }
+
+
+}

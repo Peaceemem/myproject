@@ -46,11 +46,11 @@ public class Login extends JDialog{
         btnSignUp.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                RegistrationForm loginFrame = new RegistrationForm(null);
-                loginFrame.setVisible(true);
-                loginFrame.pack();
-                loginFrame.setLocationRelativeTo(null);
-                //this.dispose();
+//                RegistrationForm loginFrame = new RegistrationForm(null);
+//                loginFrame.setVisible(true);
+//                loginFrame.pack();
+//                loginFrame.setLocationRelativeTo(null);
+//                //this.dispose();
                 dispose();
             }
         });
@@ -71,12 +71,12 @@ public class Login extends JDialog{
         User user = null;
         final String OB_URL = "jdbc:mysql://localhost/project?serverTimeZone=UTC";
         final String USERNAME = "root";
-        final String PASSWORD = "";
+        final String PASSWORD = "peace@966721";
         try {
             Connection conn = DriverManager.getConnection(OB_URL, USERNAME, PASSWORD);
 
             Statement stat = conn.createStatement();
-            String sql = "SELECT * FROM users WHERE email=? AND password=?";
+            String sql = "SELECT * FROM user WHERE email=? AND password=?";
             PreparedStatement prepareStatement = conn.prepareStatement(sql);
             prepareStatement.setString(1, email);
             prepareStatement.setString(2, password);
